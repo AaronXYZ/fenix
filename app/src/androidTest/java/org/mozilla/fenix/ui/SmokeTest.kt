@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.ActivityTestRule
-import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import mozilla.components.browser.state.store.BrowserStore
 import mozilla.components.concept.engine.mediasession.MediaSession
@@ -32,6 +31,7 @@ import org.mozilla.fenix.helpers.TestHelper
 import org.mozilla.fenix.helpers.TestHelper.appName
 import org.mozilla.fenix.helpers.TestHelper.createCustomTabIntent
 import org.mozilla.fenix.helpers.TestHelper.deleteDownloadFromStorage
+import org.mozilla.fenix.helpers.TestHelper.packageName
 import org.mozilla.fenix.helpers.TestHelper.scrollToElementByText
 import org.mozilla.fenix.helpers.ViewVisibilityIdlingResource
 import org.mozilla.fenix.ui.robots.browserScreen
@@ -67,6 +67,7 @@ class SmokeTest {
     private val collectionName = "First Collection"
     private var bookmarksListIdlingResource: RecyclerViewIdlingResource? = null
     private val customMenuItem = "TestMenuItem"
+    private val uiAutomation = InstrumentationRegistry.getInstrumentation().uiAutomation
 
     // This finds the dialog fragment child of the homeFragment, otherwise the awesomeBar would return null
     private fun getAwesomebarView(): View? {
@@ -86,11 +87,12 @@ class SmokeTest {
         IntentReceiverActivity::class.java, true, false
     )
 
-    @get:Rule
-    var mGrantPermissions = GrantPermissionRule.grant(
-        android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-        android.Manifest.permission.READ_EXTERNAL_STORAGE
-    )
+//    @get:Rule
+//    var mGrantWritePermissions =
+//        GrantPermissionRule.grant(
+//        android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+//        android.Manifest.permission.READ_EXTERNAL_STORAGE
+//    )
 
     @Before
     fun setUp() {
@@ -102,6 +104,15 @@ class SmokeTest {
             dispatcher = AndroidAssetDispatcher()
             start()
         }
+
+        uiAutomation.grantRuntimePermission(
+            packageName,
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
+        uiAutomation.grantRuntimePermission(
+            packageName,
+            android.Manifest.permission.READ_EXTERNAL_STORAGE
+        )
     }
 
     @After
